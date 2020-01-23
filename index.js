@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
 
-const { HttpModule } = NativeModules;
+const { HTTPModule } = NativeModules;
 
-export default HttpModule;
+export default HTTPModule;
