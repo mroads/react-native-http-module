@@ -23,6 +23,9 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import HTTPModule from 'react-native-http-module-mroads';
+
+console.info('HTTPModule', HTTPModule);
 
 const App: () => React$Node = () => {
   return (
