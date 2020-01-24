@@ -27,12 +27,15 @@ import HTTPModule from 'react-native-http-module-mroads';
 
 console.info('HTTPModule', HTTPModule);
 
-HTTPModule.makeGetRequest(
-  'https://jsonplaceholder.typicode.com/todos/1',
-  null,
-  null,
-  console.info,
-);
+try {
+  HTTPModule.get(
+    'https://jsonplaceholder.typicode.com/todos/1',
+    null,
+    console.info,
+  );
+} catch (error) {
+  console.warn('error', error);
+}
 
 const App: () => React$Node = () => {
   return (
