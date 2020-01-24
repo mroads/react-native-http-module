@@ -29,10 +29,10 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
 
     ReactApplicationContext _reactContext;
 
-    public  String headers;
+    public String headers;
 
     @ReactMethod
-    public void setHeaders(String headers){
+    public void setHeaders(String headers) {
         Log.d("HTTPModule ", "SetHeaders:" + headers);
         this.headers = headers;
     }
@@ -47,13 +47,38 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
         _reactContext = context;
     }
 
-    // If headers/body are not needed - send them empty instead of null
-    @ReactMethod
-    public void makeGetRequest(final String url,final String headers, final String body, final Callback callback) {
-        Log.d("HTTPModule", "In makeGetRequest: URL " + url + " Headers: " + headers + " body: " + body);
+
+    private boolean checkIfNetworkIsConnected() {
         ConnectivityManager cm = (ConnectivityManager) getReactApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+    }
+
+    private Response.ErrorListener addErrorListener(final Callback callback) {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("HTTPModule", "Error in post Request: " + error);
+                NetworkResponse response = error.networkResponse;
+                try {
+                    String res = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                    Log.i("HTTPModule", "network error response: " + res);
+                    callback.invoke(res);
+                } catch (UnsupportedEncodingException unsupportedEncodingException) {
+                    Log.e("HTTPModule", " getCall UnsupportedEncodingException " + unsupportedEncodingException);
+                    callback.invoke("Error in post call" + unsupportedEncodingException);
+                }
+            }
+        };
+    }
+
+    // If headers/body are not needed - send them empty instead of null
+    @ReactMethod
+    public void get(final String url, final String headers, final Callback callback) {
+        Log.d("HTTPModule", "In makeGetRequest: URL " + url + " Headers: " + headers);
+        boolean isConnected = checkIfNetworkIsConnected();
         if (isConnected) {
             RequestQueue mRequestQueue = Volley.newRequestQueue(getReactApplicationContext());
             StringRequest mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -62,22 +87,7 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
                     Log.d("HTTPModule", "Response for url " + url + ": " + response.toString());
                     callback.invoke(null, response);
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("HTTPModule", "Error in getRequest: " + error);
-                    NetworkResponse response = error.networkResponse;
-                    try {
-                        String res = new String(response.data,
-                                HttpHeaderParser.parseCharset(response.headers, "utf-8"));
-                        Log.i("HTTPModule", "network error response: " + res);
-                        callback.invoke(res);
-                    } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                        Log.e("HTTPModule", " getCall UnsupportedEncodingException " + unsupportedEncodingException);
-                        callback.invoke("Error in post call" + unsupportedEncodingException);
-                    }
-                }
-            }) {
+            }, addErrorListener(callback)) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Gson gson = new Gson();
@@ -91,12 +101,6 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
                 public String getBodyContentType() {
                     return "application/json";
                 }
-
-                @Override
-                public byte[] getBody() throws AuthFailureError {
-                    Log.d("HTTPModule ", "Request body:" + body);
-                    return body.getBytes();
-                }
             };
 
             mStringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
@@ -109,11 +113,9 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
 
     // If headers/body are not needed - send them empty instead of null
     @ReactMethod
-    public void makePostRequest(final String url,final String headers, final String body, final Callback callback) {
+    public void post(final String url, final String headers, final String body, final Callback callback) {
         Log.d("HTTPModule", "In makePostRequest: URL " + url + " Headers: " + headers + " body: " + body);
-        ConnectivityManager cm = (ConnectivityManager) getReactApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        boolean isConnected = checkIfNetworkIsConnected();
         if (isConnected) {
             RequestQueue mRequestQueue = Volley.newRequestQueue(getReactApplicationContext());
             StringRequest mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -122,22 +124,7 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
                     Log.d("HTTPModule", "Response for url " + url + ": " + response.toString());
                     callback.invoke(null, response);
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("HTTPModule", "Error in post Request: " + error);
-                    NetworkResponse response = error.networkResponse;
-                    try {
-                        String res = new String(response.data,
-                                HttpHeaderParser.parseCharset(response.headers, "utf-8"));
-                        Log.i("HTTPModule", "network error response: " + res);
-                        callback.invoke(res);
-                    } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                        Log.e("HTTPModule", " getCall UnsupportedEncodingException " + unsupportedEncodingException);
-                        callback.invoke("Error in post call" + unsupportedEncodingException);
-                    }
-                }
-            }) {
+            }, addErrorListener(callback)) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Gson gson = new Gson();
@@ -159,7 +146,6 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
                 }
             };
 
-//            mStringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             mStringRequest.setRetryPolicy(new DefaultRetryPolicy(0, 0, 0));
             mRequestQueue.add(mStringRequest);
         } else {
