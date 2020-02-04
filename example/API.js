@@ -1,31 +1,3 @@
-# react-native-http-module
-**react-native-tooltip** is a light weight library that provides the functionality to make sample HTTP requests.
-
-**Why react-native-http-module ?**
-React-native basically uses XHR to make API requests. But the android Wear OS does not support XHR requests. Hence the need to build this custom library has come. This **react-native-http-module** library supports HTTP requests in wear OS. Being promise based is another advantage of this library
-
-## Getting started
-`$ npm install react-native-http-module --save`
-
-### Mostly automatic installation
-`$ react-native link react-native-http-module`
-Linking is necessary in react-native versions <= 60
-
-#### Current support:
-This **react-native-http-module** library currently supports/exports the basic methods to make a API request. They are 
-- get
-- post
-- request
-
-## Usage
-```javascript
-import HttpModule from 'react-native-http-module';
-
-HttpModule.request(URL, METHOD: 'get'|'post', HEADERS, BODY).then(...).catch(...);
-```
-
-### Example
-```javascript
 import React, {useState} from 'react';
 import {
   Text,
@@ -144,5 +116,5 @@ const API = () => {
     </View>
   );
 };
+
 export default API;
-```

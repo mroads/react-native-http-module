@@ -15,7 +15,7 @@
   "keywords": [
     "react-native"
   ],
-  "author": "Vijay <vjkrishna21@email.com>",
+  "author": {"name":"Vijay <vjkrishna21@email.com>"},
   "license": "MIT",
   "licenseFilename": "LICENSE",
   "peerDependencies": {
