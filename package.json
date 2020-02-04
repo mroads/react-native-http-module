@@ -1,7 +1,7 @@
 {
   "name": "react-native-http-module-mroads",
   "title": "React Native Http Module",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "TODO",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,9 @@
   "keywords": [
     "react-native"
   ],
-  "author": {"name":"Vijay <vjkrishna21@email.com>"},
+  "author": {
+    "name": "Vijay <vjkrishna21@email.com>"
+  },
   "license": "MIT",
   "licenseFilename": "LICENSE",
   "peerDependencies": {
