@@ -5,6 +5,7 @@
 
 ### Why react-native-http-module ?
 React-native basically uses XHR to make API requests. But the **android Wear OS** does not support XHR requests. Hence the need to build this custom library has come. 
+
 This **react-native-http-module** library supports **HTTP requests in wear OS**. 
 
 Being **promise based** is another advantage of this library
@@ -13,8 +14,7 @@ Being **promise based** is another advantage of this library
 `$ npm install react-native-http-module --save`
 
 ### Mostly automatic installation
-`$ react-native link react-native-http-module`
-Linking is necessary in react-native versions <= 60
+`$ react-native link react-native-http-module (in react-native versions <= 60)`
 
 #### Current support:
 This **react-native-http-module** library currently supports/exports the basic methods to make a API request. They are 
