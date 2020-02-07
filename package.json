@@ -1,7 +1,7 @@
 {
   "name": "react-native-http-module-mroads",
   "title": "React Native Http Module",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A promise based HTTP module, specially for react-native projects",
   "main": "index.js",
   "scripts": {
