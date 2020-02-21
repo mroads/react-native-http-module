@@ -1,8 +1,6 @@
 # react-native-http-module
 **react-native-http-module** is a light weight library that provides the functionality to make sample HTTP requests.
 
-![](http.gif)
-
 ### WHY react-native-http-module ?
 React-native basically uses XHR to make API requests. But the **android Wear OS** does not support XHR requests. Hence the need to build this custom library has come. 
 
@@ -40,6 +38,9 @@ HttpModule.request(URL, METHOD: 'get'|'post'|'delete'|'put', HEADERS, BODY).then
 ```
 
 ### EXAMPLE
+
+![](http.gif)
+
 ```javascript
 import React, {useState} from 'react';
 import {
