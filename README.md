@@ -3,33 +3,43 @@
 
 ![](http.gif)
 
-### Why react-native-http-module ?
+### WHY react-native-http-module ?
 React-native basically uses XHR to make API requests. But the **android Wear OS** does not support XHR requests. Hence the need to build this custom library has come. 
 
 This **react-native-http-module** library supports **HTTP requests in wear OS**. 
 
 Being **promise based** is another advantage of this library
 
-## Getting started
+## GETTING STARTED
 `$ npm install react-native-http-module --save`
 
-### Mostly automatic installation
+#### MOSTLY AUTOMATIC INSTALLATION
 `$ react-native link react-native-http-module (in react-native versions <= 60)`
 
-#### Current support:
-This **react-native-http-module** library currently supports/exports the basic methods to make a API request. They are 
-- get
-- post
-- request
+### CURRENT SUPPORT & USAGE
+This react-native-http-module library currently supports/exports the basic methods(get, post & request) to make a API request.
+The *request* method supports all the available methods like get, post, delete, put...
 
-## Usage
 ```javascript
 import HttpModule from 'react-native-http-module';
-
-HttpModule.request(URL, METHOD: 'get'|'post', HEADERS, BODY).then(...).catch(...);
 ```
 
-### Example
+#### GET
+```javascript
+HTTPModule.get(URL, HEADERS).then(...).catch(...);
+```
+
+#### POST
+```javascript
+HTTPModule.post(URL, HEADERS, BODY).then(...).catch(...);
+```
+
+#### REQUEST
+```javascript
+HttpModule.request(URL, METHOD: 'get'|'post'|'delete'|'put', HEADERS, BODY).then(...).catch(...);
+```
+
+### EXAMPLE
 ```javascript
 import React, {useState} from 'react';
 import {
@@ -72,25 +82,13 @@ const API = () => {
   const [headers, setHeaders] = useState(null);
   const [body, setBody] = useState(null);
   const [response, setResponse] = useState(null);
-
-  const callbackFn = (error, resp) => {
-    setResponse(error || resp);
-  }
-
+  
   const sendRequest = () => {
     if (!url || !type) {
       return;
     }
     HTTPModule.request(url, type, headers, body).then(response => setResponse(response)).catch(error => setResponse(error));
   };
-
-  const reset = () => {
-    setType('get');
-    setURL('');
-    setHeaders(null);
-    setBody(null);
-    setResponse(null);
-  }
 
   return (
     <View style={styles.container}>
@@ -132,19 +130,6 @@ const API = () => {
           onChangeText={text => setResponse(text)}
           value={response}
         />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-          <Button
-            title="Copy to clipboard"
-            onPress={() => Clipboard.setString(response)}
-            color="green"
-            disabled={!response}
-          />
-          <Button
-            title="Make another request"
-            onPress={reset}
-            color="gray"
-          />
-        </View>
       </View>
     </View>
   );
