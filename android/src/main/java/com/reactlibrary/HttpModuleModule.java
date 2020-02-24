@@ -7,21 +7,18 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.google.gson.Gson;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,76 +52,62 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
         return isConnected;
     }
 
-    private Response.ErrorListener addErrorListener(final Callback callback) {
+    private Response.ErrorListener addErrorListener(final Promise promise) {
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("HTTPModule", "Error in post Request: " + error);
-                NetworkResponse response = error.networkResponse;
-                try {
-                    String res = new String(response.data,
-                            HttpHeaderParser.parseCharset(response.headers, "utf-8"));
-                    Log.i("HTTPModule", "network error response: " + res);
-                    callback.invoke(res);
-                } catch (UnsupportedEncodingException unsupportedEncodingException) {
-                    Log.e("HTTPModule", " getCall UnsupportedEncodingException " + unsupportedEncodingException);
-                    callback.invoke("Error in post call" + unsupportedEncodingException);
-                }
+//                Log.e("HTTPModule", "Error in post Request: " + error);
+//                NetworkResponse response = error.networkResponse;
+//                try {
+//                    String res = new String(response.data,
+//                            HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+//                    Log.i("HTTPModule", "network error response: " + res);
+//                    callback.invoke(res);
+//                } catch (UnsupportedEncodingException unsupportedEncodingException) {
+//                    Log.e("HTTPModule", " getCall UnsupportedEncodingException " + unsupportedEncodingException);
+//                    callback.invoke("Error in post call" + unsupportedEncodingException);
+//                }
+                promise.reject(error);
             }
         };
     }
 
-    // If headers/body are not needed - send them empty instead of null
-    @ReactMethod
-    public void get(final String url, final String headers, final Callback callback) {
-        Log.d("HTTPModule", "In makeGetRequest: URL " + url + " Headers: " + headers);
-        boolean isConnected = checkIfNetworkIsConnected();
-        if (isConnected) {
-            RequestQueue mRequestQueue = Volley.newRequestQueue(getReactApplicationContext());
-            StringRequest mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("HTTPModule", "Response for url " + url + ": " + response.toString());
-                    callback.invoke(null, response);
-                }
-            }, addErrorListener(callback)) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Gson gson = new Gson();
-                    Map<String, String> map = new HashMap<String, String>();
-                    map = (Map<String, String>) gson.fromJson(headers, map.getClass());
-                    Log.d("HTTPModule", "Headers: " + map.toString());
-                    return map;
-                }
-
-                @Override
-                public String getBodyContentType() {
-                    return "application/json";
-                }
-            };
-
-            mStringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            mRequestQueue.add(mStringRequest);
-        } else {
-            Log.w("HTTPModule", "No internet connection");
-            callback.invoke("No internet connection", null);
+    private Integer getMethod(final String method) {
+        Integer methodType = 0;
+        switch(method) {
+            case "get": {
+                methodType = Request.Method.GET;
+                break;
+            }
+            case "post": {
+                methodType = Request.Method.POST;
+                break;
+            }
+            case "put": {
+                methodType = Request.Method.PUT;
+                break;
+            }
+            case "delete": {
+                methodType = Request.Method.DELETE;
+                break;
+            }
         }
+        return methodType;
     }
 
-    // If headers/body are not needed - send them empty instead of null
     @ReactMethod
-    public void post(final String url, final String headers, final String body, final Callback callback) {
-        Log.d("HTTPModule", "In makePostRequest: URL " + url + " Headers: " + headers + " body: " + body);
+    public void request(final String url, final String method, final String headers, final String body, final Promise promise) {
+        Log.d("HTTPModule", "In request method: URL " + url + "method: " + method + " Headers: " + headers + " body: " + body);
         boolean isConnected = checkIfNetworkIsConnected();
         if (isConnected) {
             RequestQueue mRequestQueue = Volley.newRequestQueue(getReactApplicationContext());
-            StringRequest mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            StringRequest mStringRequest = new StringRequest(this.getMethod(method), url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.d("HTTPModule", "Response for url " + url + ": " + response.toString());
-                    callback.invoke(null, response);
+                    promise.resolve(response);
                 }
-            }, addErrorListener(callback)) {
+            }, addErrorListener(promise)) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Gson gson = new Gson();
@@ -150,7 +133,7 @@ public class HttpModuleModule extends ReactContextBaseJavaModule {
             mRequestQueue.add(mStringRequest);
         } else {
             Log.w("HTTPModule", "No internet connection");
-            callback.invoke("No internet connection", null);
+            promise.reject("No internet connection");
         }
-    }
+    } 
 }
