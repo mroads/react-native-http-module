@@ -20,21 +20,26 @@ The *request* method supports all the available methods like get, post, delete, 
 
 ```javascript
 import HttpModule from 'react-native-http-module';
+
+const httpModule = new HttpModule(baseURL, headers);
 ```
+This module supports a default constructor that takes the following args:
+* *baseURL - The application's default endpoint URL. If this is empty, complete endpoint URL given is considered.*
+* *headers - The default headers that can be set for set of upcoming requests.*
 
 #### GET
 ```javascript
-HTTPModule.get(URL, HEADERS).then(...).catch(...);
+httpModule.get(URL, HEADERS).then(...).catch(...);
 ```
 
 #### POST
 ```javascript
-HTTPModule.post(URL, HEADERS, BODY).then(...).catch(...);
+httpModule.post(URL, HEADERS, BODY).then(...).catch(...);
 ```
 
 #### REQUEST
 ```javascript
-HttpModule.request(URL, METHOD: 'get'|'post'|'delete'|'put', HEADERS, BODY).then(...).catch(...);
+httpModule.request(URL, METHOD: 'get'|'post'|'delete'|'put', HEADERS, BODY).then(...).catch(...);
 ```
 
 ### EXAMPLE
@@ -88,7 +93,9 @@ const API = () => {
     if (!url || !type) {
       return;
     }
-    HTTPModule.request(url, type, headers, body).then(response => setResponse(response)).catch(error => setResponse(error));
+    new HTTPModule().request(url, type, headers, body)
+      .then(response => setResponse(response))
+      .catch(error => setResponse(error));
   };
 
   return (

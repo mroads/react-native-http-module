@@ -44,10 +44,9 @@ const API = () => {
     if (!url || !type) {
       return;
     }
-    console.info('HTTPModule', HTTPModule);
     new HTTPModule().request(url, type, headers, body)
       .then(response => setResponse(response))
-      .catch(error => setResponse(error));
+      .catch(error => setResponse(error.toString()));
   };
 
   const reset = () => {
