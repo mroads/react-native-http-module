@@ -40,15 +40,14 @@ const API = () => {
   const [body, setBody] = useState(null);
   const [response, setResponse] = useState(null);
 
-  const callbackFn = (error, resp) => {
-    setResponse(error || resp);
-  }
-
   const sendRequest = () => {
     if (!url || !type) {
       return;
     }
-    HTTPModule.request(url, type, headers, body).then(response => setResponse(response)).catch(error => setResponse(error));
+    console.info('HTTPModule', HTTPModule);
+    new HTTPModule().request(url, type, headers, body)
+      .then(response => setResponse(response))
+      .catch(error => setResponse(error));
   };
 
   const reset = () => {
@@ -57,7 +56,7 @@ const API = () => {
     setHeaders(null);
     setBody(null);
     setResponse(null);
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -99,18 +98,14 @@ const API = () => {
           onChangeText={text => setResponse(text)}
           value={response}
         />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
           <Button
             title="Copy to clipboard"
             onPress={() => Clipboard.setString(response)}
             color="green"
             disabled={!response}
           />
-          <Button
-            title="Make another request"
-            onPress={reset}
-            color="gray"
-          />
+          <Button title="Make another request" onPress={reset} color="gray" />
         </View>
       </View>
     </View>
